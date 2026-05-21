@@ -93,7 +93,7 @@ app.post('/api/recommend-hijab', async (req, res) => {
     const systemInstruction = "You are a luxury AI hijab fashion stylist. Analyze the user's face shape and skin tone. Recommend top 3 hijab styles and color palettes that suit them. You MUST provide all descriptive text in BOTH English ('en') and Indonesian ('id').\n\n" + CATEGORY_PROMPT;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview", // Using the preview model as per original implementation
+      model: "gemini-2.5-flash", // Using the highly stable production model instead of the overloaded preview model
       contents: [
         { inlineData: { data: base64Image, mimeType: mimeType } },
         { text: `Analyze the portrait and provide hijab styling recommendations with descriptions in both English and Indonesian.` }
