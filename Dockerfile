@@ -6,7 +6,7 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies (including devDependencies for Vite build)
+# Install dependencies
 RUN npm ci
 
 # Copy the rest of the application source code
@@ -26,14 +26,11 @@ COPY package*.json ./
 # Install only production dependencies
 RUN npm ci --only=production
 
-# Install tsx globally in the container to run TypeScript server
-RUN npm install -g tsx
-
 # Copy the build output from the first stage
 COPY --from=build /app/dist ./dist
 
-# Copy server code
-COPY --from=build /app/server.ts ./
+# Copy native server code (no tsx or tsc compilation needed in production)
+COPY --from=build /app/server.js ./
 
 # Expose the port that Cloud Run expects (8080)
 EXPOSE 8080
@@ -42,5 +39,5 @@ EXPOSE 8080
 ENV NODE_ENV=production
 ENV PORT=8080
 
-# Start the Express server
-CMD ["tsx", "server.ts"]
+# Start the Express server natively
+CMD ["node", "server.js"]

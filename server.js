@@ -1,7 +1,12 @@
 import express from 'express';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenAI, Type } from '@google/genai';
+
+// In ES modules, __dirname is not defined by default, so we define it:
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables from .env file
 dotenv.config();
@@ -23,18 +28,13 @@ if (!apiKey) {
 const ai = new GoogleGenAI({ apiKey: apiKey || '' });
 
 // --- BASIC RATE LIMITING MIDDLEWARE ---
-interface RateLimitRecord {
-  count: number;
-  resetTime: number;
-}
-
-const rateLimits = new Map<string, RateLimitRecord>();
+const rateLimits = new Map();
 const WINDOW_MS = 60 * 1000; // 1 minute window
 const MAX_REQUESTS = 10;     // Max 10 requests per minute per IP
 
-function basicRateLimiter(req: express.Request, res: express.Response, next: express.NextFunction) {
+function basicRateLimiter(req, res, next) {
   // Get client IP address
-  const ip = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || 'unknown';
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
   const now = Date.now();
 
   let record = rateLimits.get(ip);
@@ -198,7 +198,7 @@ app.post('/api/recommend-hijab', async (req, res) => {
 
     const parsedResult = JSON.parse(response.text);
     return res.json(parsedResult);
-  } catch (error: any) {
+  } catch (error) {
     console.error("Gemini face analysis API error:", error);
     return res.status(500).json({ error: error.message || 'Gagal menganalisis wajah.' });
   }
@@ -248,7 +248,7 @@ app.post('/api/generate-preview', async (req, res) => {
     }
 
     return res.json({ image: imageBase64 });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Gemini image generation API error:", error);
     return res.status(500).json({ error: error.message || 'Gagal menghasilkan preview hijab.' });
   }
