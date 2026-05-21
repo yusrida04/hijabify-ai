@@ -1,0 +1,8 @@
+{
+  "name": "Hijabify AI",
+  "description": "Luxury AI-powered virtual stylist for personalized hijab recommendations and realistic virtual hijab generation.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": []
+}
